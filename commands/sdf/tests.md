@@ -24,7 +24,7 @@ Flow name: $ARGUMENTS
 
 For each phase in the plan, write tests that define completion criteria using the testing strategy.
 
-Write test specs to `.sdf/flows/<flow-name>/tests/phase_N_tests.md` (one file per phase).
+Write test specs to `.sdf/flows/<flow-name>/tests/phase_N_tests.md` (one file per phase). If a phase has no dedicated tests because it is fully covered by another phase's tests, do not create a test file for it -- instead note in STATE.md which phases' tests cover it (e.g., `phase_1: covered by phase 3, 4 tests`).
 
 Update STATE.md to `current_stage: 8`.
 
@@ -49,7 +49,8 @@ After all phases are approved:
 2. Use `AskUserQuestion`:
    - Question: "All test suites approved. Ready to start implementation?"
    - Header: "Implement?"
-   - Options: "Start now -- run `/sdf:start <flow-name>`" / "Make changes first"
+   - Options: "Start now" / "Start in a new conversation (recommended for large plans)" / "Make changes first"
 
-If **start now**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context.
+If **start now**: proceed directly to Stage 10 implementation in this conversation.
+If **new conversation**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
 If **make changes first**: the flow is saved and ready.

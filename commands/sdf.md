@@ -164,10 +164,13 @@ Phases can include additional sections if needed (migration steps, external serv
 
 Write the plan to `.sdf/flows/<flow-name>/PLAN_<flow-name>.md`.
 
-Present the plan to the user. Then ask:
-> Review the plan. We will refine it with questions in the next stage.
+Present the plan to the user. Then use `AskUserQuestion`:
+- Question: "Plan generated. How would you like to proceed?"
+- Header: "Plan"
+- Options: "Ready for plan questions" / "I have initial thoughts first"
 
-Update STATE.md to `current_stage: 5, valid_stages: [1,2,3,4,5]`. Proceed to Stage 6.
+If **ready**: update STATE.md to `current_stage: 5, valid_stages: [1,2,3,4,5]`. Proceed to Stage 6.
+If **initial thoughts**: let the user share thoughts, incorporate if needed, then proceed to Stage 6.
 
 ---
 
@@ -223,7 +226,7 @@ Read `.sdf/flows/<flow-name>/PLAN_<flow-name>.md` and `.sdf/flows/<flow-name>/TE
 
 For each phase in the plan, write tests that define completion criteria. Use the testing strategy established in Stage 7.
 
-Write test specs to `.sdf/flows/<flow-name>/tests/phase_N_tests.md` (one file per phase).
+Write test specs to `.sdf/flows/<flow-name>/tests/phase_N_tests.md` (one file per phase). If a phase has no dedicated tests because it is fully covered by another phase's tests, do not create a test file for it -- instead note in STATE.md which phases' tests cover it (e.g., `phase_1: covered by phase 3, 4 tests`).
 
 Update STATE.md to `current_stage: 8, valid_stages: [1,2,3,4,5,6,7,8]`. Proceed to Stage 9.
 
@@ -248,9 +251,10 @@ After all phases are approved:
 2. Use `AskUserQuestion`:
    - Question: "All test suites approved. Ready to start implementation?"
    - Header: "Implement?"
-   - Options: "Start now -- run `/sdf:start <flow-name>`" / "Make changes first"
+   - Options: "Start now" / "Start in a new conversation (recommended for large plans)" / "Make changes first"
 
-If **start now**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. Do NOT attempt to run Stage 10 from this conversation -- it must start with a clean context window.
+If **start now**: proceed directly to Stage 10 implementation in this conversation.
+If **new conversation**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
 If **make changes first**: the flow is saved and ready. The user can use subcommands to revise and start when ready.
 
 ---
@@ -294,4 +298,4 @@ The invalidation chain:
 2. **Wait for user input.** Never skip a stage or auto-advance past a point that requires user approval.
 3. **Use AskUserQuestion for all questions and confirmations.** Never print questions as plain text with (A), (B), (C) labels. Always use the `AskUserQuestion` tool. It supports up to 4 questions per call (batch larger rounds into sequential calls) and 2-4 options per question (an "Other" freeform option is added automatically).
 4. **Closing question in every round.** The "Do you need more questions?" question must be in the last batch of every Q&A round, every time, no exceptions.
-5. **No implementation.** This orchestrator handles Stages 1-9 only. Stage 10 runs via `/sdf:start` in a fresh context.
+5. **Implementation is optional from this conversation.** If the user chooses "Start now" at the end of Stage 9, proceed to Stage 10 directly. Otherwise, Stage 10 can run later via `/sdf:start` in a fresh context.
