@@ -40,10 +40,14 @@ Read `.sdf/flows/<flow-name>/STATE.md` to determine the current stage and checkp
 Check if the project directory contains an existing codebase (source files, package.json, Cargo.toml, build configs, etc.). Ignore the `.sdf/` directory itself.
 
 - If **existing codebase found**: perform a lightweight scan and write results to `.sdf/CODEBASE_SCAN.md`. The scan should capture:
-  - Tech stack and frameworks detected
-  - Project structure and key directories
-  - Existing conventions (naming, patterns, architecture)
-  - Relevant configuration (build tools, test runners, linters)
+  - **Project purpose**: what the application does, its domain, and target users (check README, package.json description, or infer from code)
+  - **CLAUDE.md rules**: if any CLAUDE.md files exist (root or subdirectories), read them and summarize key rules, conventions, and constraints -- these override defaults
+  - **Tech stack and frameworks**: languages, frameworks, major libraries
+  - **Project structure**: key directories and their roles
+  - **Existing conventions**: naming patterns, architecture style, code organization patterns
+  - **Relevant configuration**: build tools, linters, formatters, environment setup
+  - **Testing setup**: test framework(s), test directory structure, existing helpers/fixtures, how to run tests
+  - **Core entities/models**: key domain objects and their relationships (check models/, types/, or schema files)
   Then tell the user: "Codebase scan complete. This will inform all stages."
 
 - If **no codebase found** (empty or no meaningful code): skip the scan, proceed as greenfield. If `.sdf/CODEBASE_SCAN.md` already exists from a previous flow, keep it.
@@ -67,10 +71,12 @@ Restate the user's ask back to them -- clear, succinct, and structured.
 - If `.sdf/CODEBASE_SCAN.md` exists, reflect how the ask fits within the existing project.
 - If other active flows exist, note any potential overlap or interaction with them.
 
-Then ask:
-> Does this capture your intent? Confirm, correct, or add anything.
+Then use `AskUserQuestion` to confirm:
+- Question: "Does this capture your intent?"
+- Header: "Echo Back"
+- Options: "Yes, confirmed" / "Needs correction" / "Add something"
 
-Wait for the user's response. If they correct or add, incorporate changes and echo back again. Repeat until the user confirms.
+If the user corrects or adds, incorporate changes, echo back again, and re-ask. Repeat until confirmed.
 
 ---
 
@@ -80,22 +86,21 @@ Identify important ambiguities in the ask and prepare targeted questions. Run in
 
 ### Each round:
 
-Present questions, each with:
-- **Preset answer options** labeled (A), (B), (C), etc.
-- A **freeform option** as the last choice for each question (e.g., "(D) Other -- describe")
+Use the `AskUserQuestion` tool to present questions interactively. Each question gets 2-4 preset options (an "Other" freeform option is added automatically by the tool). The tool accepts up to 4 questions per call, so if a round has more than 4 questions, present them in sequential batches of up to 4.
+
+Each question requires: `question` (the question text), `header` (short label, max 12 chars), `options` (2-4 choices with `label` and `description`), and `multiSelect` (usually false).
 
 **Mandatory questions in the first round:**
 1. **Flow name**: Suggest a short, hyphenated name for this flow (e.g., `admin-interface`, `auth-overhaul`). This becomes both the plan filename and the flow identifier.
-   > Suggested flow name: `<your-suggestion>`
-   > (A) Accept
-   > (B) Use a different name -- type it
+   - Header: "Flow name"
+   - Options: "Accept `<your-suggestion>`" / "Different name"
 
-**The last question in EVERY round must be:**
-> Do you need more questions?
-> (A) Yes, ask more
-> (B) No, stop after this round
+**The last question in EVERY round must be (always in the last batch):**
+- Question: "Do you need more questions?"
+- Header: "More Qs?"
+- Options: "Yes, ask more" / "No, stop after this round"
 
-Wait for the user's answers.
+Wait for the user's answers via the tool.
 
 ### After each round:
 
@@ -123,15 +128,13 @@ Read `.sdf/flows/<flow-name>/DECISIONS_ASK.md` to ensure you have all decisions.
 
 Present the completed ask -- enriched by all the Q&A -- to the user. This should be clear, structured, and comprehensive.
 
-Then ask:
-> Is this refined ask accurate and complete?
-> (A) Yes, approve it
-> (B) I want to edit it -- tell me what to change
-> (C) Let me provide edits directly
+Then use `AskUserQuestion` to get approval:
+- Question: "Is this refined ask accurate and complete?"
+- Header: "Refined Ask"
+- Options: "Yes, approve it" / "I want to edit it" / "Let me provide edits directly"
 
-Wait for the user's response.
-- If **(A)**: write the refined ask to `.sdf/flows/<flow-name>/REFINED_ASK.md`. Update STATE.md to `current_stage: 4, valid_stages: [1,2,3,4]`. Proceed to Stage 5.
-- If **(B)** or **(C)**: incorporate edits, present again, repeat until approved.
+- If **approved**: write the refined ask to `.sdf/flows/<flow-name>/REFINED_ASK.md`. Update STATE.md to `current_stage: 4, valid_stages: [1,2,3,4]`. Proceed to Stage 5.
+- If **edit requested**: incorporate edits, present again, repeat until approved.
 
 ---
 
@@ -172,11 +175,11 @@ Update STATE.md to `current_stage: 5, valid_stages: [1,2,3,4,5]`. Proceed to Sta
 
 Read `.sdf/flows/<flow-name>/PLAN_<flow-name>.md`.
 
-Same question mechanism as Stage 3 -- preset answers + freeform option per question. Same built-in closing question in every round:
+Same question mechanism as Stage 3 -- use `AskUserQuestion` for all questions, up to 4 per call, with the closing question always in the last batch:
 
-> Do you need more questions?
-> (A) Yes, ask more
-> (B) No, stop after this round
+- Question: "Do you need more questions?"
+- Header: "More Qs?"
+- Options: "Yes, ask more" / "No, stop after this round"
 
 After each round:
 1. Write accumulated decisions to `.sdf/flows/<flow-name>/DECISIONS_PLAN.md`.
@@ -184,10 +187,10 @@ After each round:
 
 When rounds are complete (user says stop or no more gaps):
 1. **Update the plan**: apply all decisions to `.sdf/flows/<flow-name>/PLAN_<flow-name>.md`.
-2. Present the **updated plan** to the user for approval:
-   > Here is the updated plan with all decisions applied. Review and approve.
-   > (A) Plan looks good -- approve
-   > (B) I want changes -- specify
+2. Present the **updated plan** to the user and use `AskUserQuestion` for approval:
+   - Question: "Plan updated with all decisions. Approve?"
+   - Header: "Plan"
+   - Options: "Plan looks good -- approve" / "I want changes"
 3. Repeat until approved.
 4. Update STATE.md to `current_stage: 6, valid_stages: [1,2,3,4,5,6]`. Proceed to Stage 7.
 
@@ -195,24 +198,19 @@ When rounds are complete (user says stop or no more gaps):
 
 ## Stage 7: Testing Strategy Questions
 
-A dedicated round-based Q&A focused exclusively on testing. Same mechanism as Stages 3 and 6.
+A dedicated round-based Q&A focused exclusively on testing. Use `AskUserQuestion` for all questions, up to 4 per call.
 
 **First round must include this question:**
-
-> What testing approach fits this implementation?
-> (A) Unit tests (isolated function/component tests)
-> (B) Integration tests (tests that hit real services/databases)
-> (C) End-to-end tests (full user flow tests, e.g. Playwright/Cypress)
-> (D) Acceptance criteria checks (structured pass/fail assertions against requirements)
-> (E) Mix -- specify which types for which phases
-> (F) Freeform -- describe your testing preference
+- Question: "What testing approach fits this implementation?"
+- Header: "Test type"
+- Options: "Unit tests" (isolated function/component tests) / "Integration tests" (hit real services/databases) / "End-to-end tests" (full user flow, e.g. Playwright/Cypress) / "Mix or other"
 
 Subsequent rounds (if requested) dig deeper: specific frameworks and tooling, coverage expectations, what to mock vs hit real, edge cases to cover, performance thresholds, phases needing heavier vs lighter testing.
 
-Same closing question every round:
-> Do you need more questions?
-> (A) Yes, ask more
-> (B) No, stop after this round
+Same closing question in the last batch of every round:
+- Question: "Do you need more questions?"
+- Header: "More Qs?"
+- Options: "Yes, ask more" / "No, stop after this round"
 
 After rounds complete: write all decisions to `.sdf/flows/<flow-name>/TESTING_STRATEGY.md`.
 Update STATE.md to `current_stage: 7, valid_stages: [1,2,3,4,5,6,7]`. Proceed to Stage 8.
@@ -233,19 +231,11 @@ Update STATE.md to `current_stage: 8, valid_stages: [1,2,3,4,5,6,7,8]`. Proceed 
 
 ## Stage 9: Test Review and Calibration
 
-Present the tests **per phase** to the user. For each phase, show:
+Present the tests **per phase** to the user. For each phase, show the test list as text, then use `AskUserQuestion` for the verdict:
 
-> **Phase N: `<phase name>`**
-> Tests:
-> - Test 1: description
-> - Test 2: description
-> - ...
->
-> (A) Tests look good -- approve
-> (B) Need more tests -- specify what is missing
-> (C) Too many tests / over-tested -- specify what to remove
-> (D) Change specific test(s) -- specify which and how
-> (E) Freeform feedback
+- Question: "Phase N: `<phase name>` -- verdict on these tests?"
+- Header: "Phase N"
+- Options: "Approve" / "Need more tests" / "Too many tests" / "Change specific test(s)"
 
 Track approvals per phase in STATE.md.
 
@@ -255,13 +245,13 @@ Track approvals per phase in STATE.md.
 
 After all phases are approved:
 1. Update STATE.md to `current_stage: 9, valid_stages: [1,2,3,4,5,6,7,8,9]`.
-2. Ask the user:
-   > All test suites approved. Ready to start implementation?
-   > (A) Start implementation now -- run `/sdf:start <flow-name>`
-   > (B) Make changes first -- use subcommands to revise, then start manually with `/sdf:start <flow-name>`
+2. Use `AskUserQuestion`:
+   - Question: "All test suites approved. Ready to start implementation?"
+   - Header: "Implement?"
+   - Options: "Start now -- run `/sdf:start <flow-name>`" / "Make changes first"
 
-If **(A)**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. Do NOT attempt to run Stage 10 from this conversation -- it must start with a clean context window.
-If **(B)**: the flow is saved and ready. The user can use subcommands to revise and start when ready.
+If **start now**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. Do NOT attempt to run Stage 10 from this conversation -- it must start with a clean context window.
+If **make changes first**: the flow is saved and ready. The user can use subcommands to revise and start when ready.
 
 ---
 
@@ -302,6 +292,6 @@ The invalidation chain:
 
 1. **Files are the source of truth.** At each stage boundary, read inputs from `.sdf/` files, not from conversation memory.
 2. **Wait for user input.** Never skip a stage or auto-advance past a point that requires user approval.
-3. **Preset + freeform.** Every question must have preset options AND a freeform option.
-4. **Closing question in every round.** The "Do you need more questions?" question must be the last question in every Q&A round, every time, no exceptions.
+3. **Use AskUserQuestion for all questions and confirmations.** Never print questions as plain text with (A), (B), (C) labels. Always use the `AskUserQuestion` tool. It supports up to 4 questions per call (batch larger rounds into sequential calls) and 2-4 options per question (an "Other" freeform option is added automatically).
+4. **Closing question in every round.** The "Do you need more questions?" question must be in the last batch of every Q&A round, every time, no exceptions.
 5. **No implementation.** This orchestrator handles Stages 1-9 only. Stage 10 runs via `/sdf:start` in a fresh context.

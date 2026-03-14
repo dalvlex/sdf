@@ -19,9 +19,8 @@ Flow name: $ARGUMENTS
    - `.sdf/flows/<flow-name>/DECISIONS_ASK.md` (if it exists, for existing decisions)
    - `.sdf/CODEBASE_SCAN.md` (if it exists)
 
-5. **Run Q&A rounds.** Same mechanism as the main orchestrator Stage 3:
-   - Each question has preset options (A, B, C...) plus a freeform option.
-   - The last question in every round is: "Do you need more questions? (A) Yes, ask more / (B) No, stop after this round"
+5. **Run Q&A rounds.** Use the `AskUserQuestion` tool for all questions (up to 4 per call, batch larger rounds into sequential calls). Each question gets 2-4 options (an "Other" freeform is added automatically).
+   - The last question in the last batch of every round must be: "Do you need more questions?" with options "Yes, ask more" / "No, stop after this round" (header: "More Qs?").
    - After each round, write accumulated decisions to `.sdf/flows/<flow-name>/DECISIONS_ASK.md`.
    - Update STATE.md checkpoint.
 

@@ -19,20 +19,16 @@ Flow name: $ARGUMENTS
    - `.sdf/flows/<flow-name>/TESTING_STRATEGY.md` (if it exists, for existing decisions)
    - `.sdf/CODEBASE_SCAN.md` (if it exists)
 
-5. **Run Q&A rounds.** Focused exclusively on testing. Same round mechanism.
+5. **Run Q&A rounds.** Focused exclusively on testing. Use the `AskUserQuestion` tool for all questions (up to 4 per call, batch larger rounds into sequential calls).
 
    **First round must include:**
-   > What testing approach fits this implementation?
-   > (A) Unit tests (isolated function/component tests)
-   > (B) Integration tests (tests that hit real services/databases)
-   > (C) End-to-end tests (full user flow tests, e.g. Playwright/Cypress)
-   > (D) Acceptance criteria checks (structured pass/fail assertions against requirements)
-   > (E) Mix -- specify which types for which phases
-   > (F) Freeform -- describe your testing preference
+   - Question: "What testing approach fits this implementation?"
+   - Header: "Test type"
+   - Options: "Unit tests" (isolated function/component tests) / "Integration tests" (hit real services/databases) / "End-to-end tests" (full user flow, e.g. Playwright/Cypress) / "Mix or other"
 
    Subsequent rounds dig deeper: frameworks, tooling, coverage, mocking strategy, edge cases, per-phase testing weight.
 
-   Last question in every round: "Do you need more questions? (A) Yes, ask more / (B) No, stop after this round"
+   Last question in the last batch of every round: "Do you need more questions?" with options "Yes, ask more" / "No, stop after this round" (header: "More Qs?")
 
 6. **After rounds complete**, write all decisions to `.sdf/flows/<flow-name>/TESTING_STRATEGY.md`.
 

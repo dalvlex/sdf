@@ -32,19 +32,11 @@ Update STATE.md to `current_stage: 8`.
 
 ## Stage 9: Test Review and Calibration
 
-Present the tests **per phase** to the user. For each phase, show:
+Present the tests **per phase** to the user. For each phase, show the test list as text, then use `AskUserQuestion` for the verdict:
 
-> **Phase N: `<phase name>`**
-> Tests:
-> - Test 1: description
-> - Test 2: description
-> - ...
->
-> (A) Tests look good -- approve
-> (B) Need more tests -- specify what is missing
-> (C) Too many tests / over-tested -- specify what to remove
-> (D) Change specific test(s) -- specify which and how
-> (E) Freeform feedback
+- Question: "Phase N: `<phase name>` -- verdict on these tests?"
+- Header: "Phase N"
+- Options: "Approve" / "Need more tests" / "Too many tests" / "Change specific test(s)"
 
 Track approvals per phase in STATE.md.
 
@@ -54,10 +46,10 @@ Track approvals per phase in STATE.md.
 
 After all phases are approved:
 1. Update STATE.md to `current_stage: 9, valid_stages: [1,2,3,4,5,6,7,8,9]`.
-2. Ask the user:
-   > All test suites approved. Ready to start implementation?
-   > (A) Start implementation now -- run `/sdf:start <flow-name>`
-   > (B) Make changes first -- use subcommands to revise, then start manually with `/sdf:start <flow-name>`
+2. Use `AskUserQuestion`:
+   - Question: "All test suites approved. Ready to start implementation?"
+   - Header: "Implement?"
+   - Options: "Start now -- run `/sdf:start <flow-name>`" / "Make changes first"
 
-If (A): tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context.
-If (B): the flow is saved and ready.
+If **start now**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context.
+If **make changes first**: the flow is saved and ready.
