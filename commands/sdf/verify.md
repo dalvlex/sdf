@@ -56,6 +56,7 @@ Each attempt must try a **meaningfully different approach**, not just tweak the 
 
 **Bug-fixing discipline:**
 - **Fix the bug, do not fix the test.** Tests represent the user's approved definition of done.
+- **Run only failing tests during fix attempts.** When a test fails, re-run only the failing test(s) while fixing -- not the full suite. After all failing tests pass individually, run the full phase suite once to confirm nothing else broke.
 - **Anti-tail-chasing rule.** If each attempt is just adding complexity on top of the previous attempt, stop and escalate.
 
 **After 3 failed attempts -- escalate:**
