@@ -181,6 +181,10 @@ All state lives in `.sdf/` files. The conversation is the UX layer; files are th
 - Subcommands work from any conversation -- they read state from disk
 - Context degradation doesn't matter -- Claude reads fresh from files
 
+### Resuming Flows
+
+Start a new conversation and run `/sdf <flow-name>`. SDF reads `STATE.md` and picks up from the exact stage you left off. This works across conversation crashes, context limits, or deliberate restarts.
+
 ### Stage Invalidation
 
 Re-running an earlier stage marks all later stages as stale:
