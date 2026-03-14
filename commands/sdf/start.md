@@ -44,6 +44,8 @@ Parse the plan into phases. Determine the order of execution based on phase depe
 
 Update STATE.md to `current_stage: 10`.
 
+**Create tasks for progress tracking.** Use `TaskCreate` to create one task per phase (in dependency order) so the user can see implementation progress at a glance. Each task title should be: `Phase N: <phase name>`.
+
 ---
 
 ## Implementation Loop
@@ -51,6 +53,7 @@ Update STATE.md to `current_stage: 10`.
 For each phase (in dependency order):
 
 ### 1. Start the phase
+- Mark the phase's task as `in_progress` using `TaskUpdate`.
 - Update `.sdf/flows/<flow-name>/phases/phase_N_status.md` with:
   ```
   status: in_progress
@@ -73,6 +76,7 @@ After implementation, run the phase's tests. Record results.
 ### 4. Evaluate results
 
 **If all tests pass:**
+- Mark the phase's task as `completed` using `TaskUpdate`.
 - Update `.sdf/flows/<flow-name>/phases/phase_N_status.md`:
   ```
   status: passing
@@ -95,7 +99,8 @@ Each attempt must try a **meaningfully different approach**, not just tweak the 
 - **Anti-tail-chasing rule.** If each attempt is just adding complexity on top of the previous attempt, you are chasing your tail. Stop and escalate.
 
 **After 3 failed attempts -- escalate:**
-1. Update `.sdf/flows/<flow-name>/phases/phase_N_status.md`:
+1. Mark the phase's task as `blocked` using `TaskUpdate` with a note about the failure.
+2. Update `.sdf/flows/<flow-name>/phases/phase_N_status.md`:
    ```
    status: blocked
    tests_total: N
@@ -103,7 +108,7 @@ Each attempt must try a **meaningfully different approach**, not just tweak the 
    attempts: 3
    blocked_at: <timestamp>
    ```
-2. Write a diagnosis to `.sdf/flows/<flow-name>/phases/phase_N_blocked.md`:
+3. Write a diagnosis to `.sdf/flows/<flow-name>/phases/phase_N_blocked.md`:
    ```markdown
    # Phase N Blocked: <phase name>
 
@@ -130,7 +135,7 @@ Each attempt must try a **meaningfully different approach**, not just tweak the 
    ## Suggested Next Steps
    - ...
    ```
-3. Return control to the user with a summary:
+4. Return control to the user with a summary:
    > Phase N (`<phase name>`) is blocked after 3 attempts.
    > Passing: M/N tests.
    > See `.sdf/flows/<flow-name>/phases/phase_N_blocked.md` for full diagnosis.
