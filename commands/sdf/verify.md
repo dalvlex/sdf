@@ -16,6 +16,7 @@ Flow name: $ARGUMENTS
    - `.sdf/flows/<flow-name>/TESTING_STRATEGY.md`
    - `.sdf/flows/<flow-name>/tests/phase_N_tests.md` for each phase
    - `.sdf/CODEBASE_SCAN.md` (if it exists)
+   - `.sdf/LEARNINGS.md` (if it exists) -- project-wide learnings from previous flows
    - `CLAUDE.md` and `README.md` from the project root (if they exist) -- follow any conventions they specify
 
 4. **Create tasks for progress tracking.** Use `TaskCreate` to create one task per phase: `Verify Phase N: <phase name>`.
@@ -106,3 +107,4 @@ When all phases are processed:
 2. **Do not modify tests.** Fix the code, not the tests.
 3. **3 attempts max.** Escalate to the user after 3 failed fix attempts.
 4. **Update status files.** Keep phase status files current.
+5. **Capture learnings.** If you discover something non-obvious during verification (environment quirks, setup steps, service behaviors, gotchas, workarounds), append it to `.sdf/LEARNINGS.md` with the flow name and date.

@@ -39,6 +39,7 @@ Read these files:
 - `.sdf/flows/<flow-name>/TESTING_STRATEGY.md` -- testing approach
 - `.sdf/flows/<flow-name>/tests/phase_N_tests.md` -- test specs for each phase
 - `.sdf/CODEBASE_SCAN.md` -- if it exists, for codebase context
+- `.sdf/LEARNINGS.md` -- if it exists, for project-wide learnings from previous flows
 
 Parse the plan into phases. Determine the order of execution based on phase dependencies.
 
@@ -185,3 +186,4 @@ When all phases are processed (either passing, skipped, or blocked-and-user-deci
 4. **Do not modify tests.** Tests represent the user's approved definition of done. Fix the code, not the tests.
 5. **Update status files.** Keep phase status files current so `/sdf:status` always reflects reality.
 6. **A successful build is NOT a passing test.** You must run the actual test commands defined in the testing strategy. Type-checking or linting alone does not count as tests passing. If a phase has test specs, those tests must be written, executed, and passing.
+7. **Capture learnings.** If you discover something non-obvious during implementation (environment quirks, setup steps, service behaviors, gotchas, workarounds), append it to `.sdf/LEARNINGS.md` with the flow name and date. This file is project-wide and persists across flows.

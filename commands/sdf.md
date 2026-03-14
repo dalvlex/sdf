@@ -140,7 +140,7 @@ Then use `AskUserQuestion` to get approval:
 
 ## Stage 5: Plan Generation
 
-Read `.sdf/flows/<flow-name>/REFINED_ASK.md`. Also read `.sdf/CODEBASE_SCAN.md` if it exists.
+Read `.sdf/flows/<flow-name>/REFINED_ASK.md`. Also read `.sdf/CODEBASE_SCAN.md` and `.sdf/LEARNINGS.md` if they exist.
 
 Generate a full implementation plan. Each phase must follow this structure:
 
