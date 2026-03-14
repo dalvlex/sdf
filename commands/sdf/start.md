@@ -67,11 +67,15 @@ Use a **subagent with fresh context** for each phase. The subagent receives:
 - The phase's test spec from `.sdf/flows/<flow-name>/tests/phase_N_tests.md`
 - The codebase scan (if it exists) for project context
 - The testing strategy for framework/tooling decisions
+- **CLAUDE.md and README.md** from the project root (if they exist). The subagent must read and follow any conventions, rules, or constraints they specify.
 
-The subagent implements the code described in the phase, then writes and runs the tests from the test spec.
+The subagent implements the code described in the phase, then writes and runs the tests from the test spec. Include these explicit instructions in the subagent prompt:
+- "You MUST write the actual test files described in the test spec and run them."
+- "A successful build or type-check is NOT a substitute for tests. Tests must be written, executed, and passing."
+- "Do not mark the phase as complete until real tests pass."
 
 ### 3. Run tests
-After implementation, run the phase's tests. Record results.
+After the subagent finishes, verify that actual test files were created and run them. Determine how to run tests from the testing strategy, codebase scan, and project config (e.g., `package.json` scripts, test runner config). If you cannot figure out how to run the tests, ask the user. If the subagent skipped writing tests, write them yourself and run them before evaluating results.
 
 ### 4. Evaluate results
 
@@ -180,3 +184,4 @@ When all phases are processed (either passing, skipped, or blocked-and-user-deci
 3. **3 attempts max.** Never exceed 3 fix attempts per phase. Escalate to the user.
 4. **Do not modify tests.** Tests represent the user's approved definition of done. Fix the code, not the tests.
 5. **Update status files.** Keep phase status files current so `/sdf:status` always reflects reality.
+6. **A successful build is NOT a passing test.** You must run the actual test commands defined in the testing strategy. Type-checking or linting alone does not count as tests passing. If a phase has test specs, those tests must be written, executed, and passing.

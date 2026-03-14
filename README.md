@@ -79,6 +79,7 @@ Triggered via `/sdf:start`. Runs in a **fresh context** to avoid context rot. Ea
 | `/sdf` | Start a new flow or resume an existing one |
 | `/sdf <flow-name>` | Resume a specific flow from where it left off |
 | `/sdf:start <flow-name>` | Start autonomous implementation (Stage 10) |
+| `/sdf:verify <flow-name>` | Run all tests, write missing ones, fix failures |
 | `/sdf:status` | Show all flows and their current stage |
 | `/sdf:status <flow-name>` | Show detailed phase-level status for a flow |
 | `/sdf:questions <flow-name>` | Jump to Stage 3 -- re-run ask questions |
@@ -121,6 +122,10 @@ Runs autonomous implementation in a **fresh context** (no conversation history f
 - **3-attempt escalation**: each attempt tries a meaningfully different approach; after 3 failures, writes a diagnosis to `phase_N_blocked.md` and returns control to the user
 - **Bug-fixing discipline**: fix the code not the test; anti-tail-chasing rule
 - **Status tracking**: updates `phase_N_status.md` in real-time so `/sdf:status` stays current
+
+### `commands/sdf/verify.md` -- Test Verification
+
+Runs all tests for a flow's implemented phases. Writes test files from specs if they don't exist yet. Same 3-attempt escalation and bug-fixing discipline as Stage 10, but skips implementation -- only tests and fixes.
 
 ### `commands/sdf/status.md` -- Status Viewer
 

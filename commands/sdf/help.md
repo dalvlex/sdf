@@ -15,6 +15,7 @@ A structured, multi-stage development workflow that enforces disciplined decisio
 | `/sdf` | Start a new flow or resume an existing one |
 | `/sdf <flow-name>` | Resume a specific flow from where it left off |
 | `/sdf:start <flow-name>` | Start autonomous implementation (Stage 10) |
+| `/sdf:verify <flow-name>` | Run all tests, write missing ones, fix failures |
 | `/sdf:status` | Show all flows and their current stage |
 | `/sdf:status <flow-name>` | Show detailed status for a specific flow |
 | `/sdf:questions <flow-name>` | Jump to Stage 3 -- gap-filling questions on the ask |

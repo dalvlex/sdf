@@ -105,7 +105,7 @@ Wait for the user's answers via the tool.
 ### After each round:
 
 1. Interpret and apply all answers from this round.
-2. **After the first round** (once the flow name is established): create the directory `.sdf/flows/<flow-name>/` and all subdirectories (`tests/`, `phases/`).
+2. **After the first round** (once the flow name is established): check if `.sdf/flows/<flow-name>/` already exists. If it does, warn the user and ask for a different name. Then create the directory and all subdirectories (`tests/`, `phases/`).
 3. Write all accumulated decisions to `.sdf/flows/<flow-name>/DECISIONS_ASK.md`.
 4. Update `.sdf/flows/<flow-name>/STATE.md` with:
    ```
@@ -263,13 +263,24 @@ If **make changes first**: the flow is saved and ready. The user can use subcomm
 
 After EVERY meaningful interaction (each question round, each approval, each stage transition), update `.sdf/flows/<flow-name>/STATE.md` with:
 
-- `current_stage`: the stage number
-- `stage_name`: human-readable stage name
-- `round`: question round number (if in a Q&A stage)
-- `valid_stages`: list of stages that are current (not stale)
-- `phase_approvals`: map of phase approvals (for Stage 9)
+STATE.md must always use this structure:
 
-This ensures that if the conversation is interrupted, `/sdf <flow-name>` can resume from the exact checkpoint.
+```
+current_stage: <number>
+stage_name: <human-readable name>
+valid_stages: [<list of non-stale stage numbers>]
+```
+
+Optional fields (include when relevant):
+```
+round: <number>                    # during Q&A stages (3, 6, 7)
+phase_approvals:                   # during Stage 9
+  phase_1: approved
+  phase_2: covered by phase 3, 4 tests
+  phase_3: pending
+```
+
+Always use this exact field naming. This ensures that `/sdf <flow-name>` can parse STATE.md reliably when resuming.
 
 ---
 
