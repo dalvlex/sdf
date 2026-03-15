@@ -178,8 +178,14 @@ if command -v afplay &>/dev/null; then
 fi
 
 cleanup() {
-    [ -n "$SOUND_PID" ] && kill "$SOUND_PID" 2>/dev/null && wait "$SOUND_PID" 2>/dev/null
-    [ -n "$SOUND_RELAY_DIR" ] && rm -rf "$SOUND_RELAY_DIR"
+    set +e
+    if [ -n "$SOUND_PID" ]; then
+        kill "$SOUND_PID" 2>/dev/null
+        wait "$SOUND_PID" 2>/dev/null
+    fi
+    if [ -n "$SOUND_RELAY_DIR" ]; then
+        rm -rf "$SOUND_RELAY_DIR"
+    fi
     echo ""
     echo "SDF container stopped. Cleanup complete."
 }
@@ -195,4 +201,4 @@ docker run -it --rm \
     "${MOUNTS[@]}" \
     --add-host=host.docker.internal:host-gateway \
     "$IMAGE_NAME" \
-    "${CONTAINER_CMD[@]}"
+    "${CONTAINER_CMD[@]}" || true
