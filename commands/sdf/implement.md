@@ -183,13 +183,13 @@ When all phases are processed (either passing, skipped, or blocked-and-user-deci
 After all phases pass implementation, automatically run verification and simplification in sequence. Do not ask the user for permission -- this is part of the standard pipeline.
 
 ### Step 1: Verify
-Follow the same process as `/sdf:verify`: for each phase, confirm test files exist, write them if missing, run them, fix failures (up to 3 attempts). If any phase gets blocked during verification, stop and escalate to the user.
+First, reset all phase statuses to `pending` and set `all_phases_passing: false` in STATE.md -- no phase carries forward a "passing" or "verified" status from implementation. Then follow the same process as `/sdf:verify`: for each phase, confirm test files exist, write them if missing, run them, fix failures (up to 3 attempts). If any phase gets blocked during verification, stop and escalate to the user.
 
 ### Step 2: Simplify
 After all phases are verified, follow the same process as `/sdf:simplify`: for each phase, review for concrete simplification opportunities (DRY, reduce complexity, remove dead code). Only make changes that are directly related to this flow's implementation. Run tests after each change. Skip changes that aren't obviously better.
 
 ### Step 3: Final verify
-After simplification, run the full test suite one more time across all phases to confirm nothing was broken by the cumulative simplification changes. If any tests fail, fix them (up to 3 attempts) or revert the offending simplification.
+Reset all phase statuses to `pending` and set `all_phases_passing: false` in STATE.md again. Then run the full test suite one more time across all phases to confirm nothing was broken by the cumulative simplification changes. If any tests fail, fix them (up to 3 attempts) or revert the offending simplification.
 
 ### Step 4: Final summary
 Present a combined summary:

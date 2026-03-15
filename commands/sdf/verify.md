@@ -19,7 +19,13 @@ Flow name: $ARGUMENTS
    - `.sdf/LEARNINGS.md` (if it exists) -- project-wide learnings from previous flows
    - `CLAUDE.md` and `README.md` from the project root (if they exist) -- follow any conventions they specify
 
-4. **Create tasks for progress tracking.** Use `TaskCreate` to create one task per phase: `Verify Phase N: <phase name>`.
+4. **Reset all phase statuses.** Before running any tests, reset every phase's status to `pending`. For each phase, update `.sdf/flows/<flow-name>/phases/phase_N_status.md`:
+   ```
+   status: pending
+   ```
+   Set `all_phases_passing: false` in STATE.md. This ensures no stale "verified" status survives from a previous run -- every phase must re-earn its status by actually passing tests.
+
+5. **Create tasks for progress tracking.** Use `TaskCreate` to create one task per phase: `Verify Phase N: <phase name>`.
 
 ---
 
