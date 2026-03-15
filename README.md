@@ -8,7 +8,7 @@ SDF walks you through **10 stages**: stating your ask, refining it with targeted
 
 1. Clone this repo and install:
    ```bash
-   git clone <this-repo> ~/sdf
+   git clone https://github.com/dalvlex/sdf.git ~/sdf
    ~/sdf/install.sh
    ```
 
@@ -37,7 +37,7 @@ SDF walks you through **10 stages**: stating your ask, refining it with targeted
 ## Install
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/dalvlex/sdf.git
 cd sdf
 ./install.sh
 ```
@@ -52,19 +52,9 @@ This copies the skill files to `~/.claude/commands/`, making them available in e
 
 Removes the skill files. Your `.sdf/` project folders are untouched.
 
-## Quick Start
-
-In any project directory, run:
-
-```
-/sdf
-```
-
-SDF will walk you through all 10 stages interactively. At the end, it prompts you to start implementation with `/sdf:implement`.
-
 ## Sandboxed Mode (Docker)
 
-Run SDF with `--dangerously-skip-permissions` inside a container. No permission prompts, no risk to your host.
+Run Claude Code in a sandboxed container -- full permissions, isolated from your host.
 
 ### Usage
 
@@ -73,7 +63,7 @@ cd ~/your-project
 ~/path/to/sdf/docker/sdf-docker.sh
 ```
 
-This builds a Docker image (first time only, cached after) and drops you straight into Claude Code with `--dangerously-skip-permissions`. Run `/sdf`, `/sdf:implement`, etc. -- no permission prompts.
+Builds the Docker image (cached after first run) and drops you straight into Claude Code. No permission prompts. Run `/sdf`, `/sdf:implement`, etc.
 
 To get a bash shell instead (e.g. for debugging):
 
@@ -98,7 +88,7 @@ On macOS, the script auto-extracts your OAuth token from the Keychain -- your ex
 
 ### Sound relay
 
-Claude Code hooks that play sounds (e.g. notification pings via `afplay`) work inside the container. The launch script starts a TCP relay on the host that forwards sound requests from Docker to your Mac's speakers. Starts and stops automatically with the container.
+Claude Code hooks that play sounds (e.g. notification pings via `afplay`) work inside the container. The launch script relays sound requests from Docker to your Mac's speakers via a shared temp directory. Starts and stops automatically with the container.
 
 ### Network
 
@@ -338,8 +328,8 @@ Whether to add `.sdf/` to `.gitignore` is up to you.
 
 ## Spec
 
-The full specification and design rationale is in [IMPL_ASK.md](IMPL_ASK.md).
+The full specification and design rationale is in [ORIGINAL_ASK.md](ORIGINAL_ASK.md).
 
 ## License
 
-MIT
+[MIT](LICENSE)
