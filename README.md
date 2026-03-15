@@ -1,6 +1,6 @@
 # SDF -- Supervised Decision Flow
 
-A structured, multi-stage development workflow for [Claude Code](https://claude.com/claude-code). Enforces disciplined decision-making before any code is written.
+A structured, multi-stage development workflow for [Claude Code](https://claude.com/claude-code). macOS only -- built and tested exclusively on Mac. Enforces disciplined decision-making before any code is written.
 
 SDF walks you through **10 stages**: stating your ask, refining it with targeted Q&A, generating a phased plan, defining a testing strategy, designing tests per phase, reviewing and approving those tests, and then autonomous implementation with built-in escalation when things go wrong.
 
@@ -31,6 +31,52 @@ In any project directory, run:
 ```
 
 SDF will walk you through all 10 stages interactively. At the end, it prompts you to start implementation with `/sdf:start`.
+
+## Sandboxed Mode (Docker)
+
+Run SDF with `--dangerously-skip-permissions` inside a container. No permission prompts, no risk to your host.
+
+### Usage
+
+```bash
+cd ~/your-project
+~/path/to/sdf/docker/sdf-docker.sh
+```
+
+This builds a Docker image (first time only, cached after) and drops you straight into Claude Code with `--dangerously-skip-permissions`. Run `/sdf`, `/sdf:start`, etc. -- no permission prompts.
+
+To get a bash shell instead (e.g. for debugging):
+
+```bash
+~/path/to/sdf/docker/sdf-docker.sh bash
+```
+
+### Authentication
+
+On macOS, the script auto-extracts your OAuth token from the Keychain -- your existing Claude subscription (Pro/Max) works inside the container with no setup. Fallbacks, in priority order:
+
+1. `ANTHROPIC_API_KEY` env var (API billing)
+2. `CLAUDE_CODE_OAUTH_TOKEN` env var (subscription token)
+3. Auto-extraction from macOS Keychain (subscription)
+4. Manual `/login` inside the container
+
+### What's mounted
+
+- **Read-write**: your project folder (mounted at the same path as on host, so Claude Code's project memory works) and most of `~/.claude/` (sessions, cache, project memory, conversation history). Claude can modify these on your host.
+- **Read-only (protected)**: `~/.claude/commands/`, `~/.claude/skills/`, `~/.claude/settings.json`, `~/.claude/CLAUDE.md`, `~/.ssh/`, `~/.gitconfig`. Claude cannot modify these.
+- **Not accessible**: everything else on the host filesystem
+
+### Sound relay
+
+Claude Code hooks that play sounds (e.g. notification pings via `afplay`) work inside the container. The launch script starts a TCP relay on the host that forwards sound requests from Docker to your Mac's speakers. Starts and stops automatically with the container.
+
+### Network
+
+Full access -- internet, localhost services (via `host.docker.internal`), LAN databases, emulators, everything.
+
+### Extra packages
+
+Claude can `sudo apt-get install` mid-session. To persist packages across container rebuilds, add package names to `.sdf/packages.txt` (one per line).
 
 ## The 10 Stages
 
