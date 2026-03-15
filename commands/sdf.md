@@ -254,7 +254,7 @@ After all phases are approved:
    - Options: "Start now" / "Start in a new conversation (recommended for large plans)" / "Make changes first"
 
 If **start now**: proceed directly to Stage 10 implementation in this conversation.
-If **new conversation**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
+If **new conversation**: tell the user to run `/sdf:implement <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
 If **make changes first**: the flow is saved and ready. The user can use subcommands to revise and start when ready.
 
 ---
@@ -309,4 +309,4 @@ The invalidation chain:
 2. **Wait for user input.** Never skip a stage or auto-advance past a point that requires user approval.
 3. **Use AskUserQuestion for all questions and confirmations.** Never print questions as plain text with (A), (B), (C) labels. Always use the `AskUserQuestion` tool. It supports up to 4 questions per call (batch larger rounds into sequential calls) and 2-4 options per question (an "Other" freeform option is added automatically).
 4. **Closing question in every round.** The "Do you need more questions?" question must be in the last batch of every Q&A round, every time, no exceptions.
-5. **Implementation is optional from this conversation.** If the user chooses "Start now" at the end of Stage 9, proceed to Stage 10 directly. Otherwise, Stage 10 can run later via `/sdf:start` in a fresh context.
+5. **Implementation is optional from this conversation.** If the user chooses "Start now" at the end of Stage 9, proceed to Stage 10 directly. Otherwise, Stage 10 can run later via `/sdf:implement` in a fresh context.

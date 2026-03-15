@@ -14,7 +14,7 @@ Each SDF run is a **flow**, identified by its plan name (established in Stage 3)
 - Each flow gets its own subdirectory under `.sdf/flows/`.
 - Project-level files (like the codebase scan) are shared across all flows.
 - There is no limit on how many flows can exist in planning stages (1-9) simultaneously.
-- **Implementation guard**: only one flow should run Stage 10 at a time. When `/sdf:start <flow>` is invoked and another flow is mid-implementation, SDF warns the user and asks if they want to proceed. Concurrent implementation risks file conflicts if both flows touch the same code.
+- **Implementation guard**: only one flow should run Stage 10 at a time. When `/sdf:implement <flow>` is invoked and another flow is mid-implementation, SDF warns the user and asks if they want to proceed. Concurrent implementation risks file conflicts if both flows touch the same code.
 
 ## File Manifest
 
@@ -77,7 +77,7 @@ This is a warning, not a hard block. The user decides. The invalidation chain:
 
 - `/sdf` -- starts a new flow (enters Stage 1) OR, if flows already exist, asks: "(A) Start a new flow / (B) Resume an existing flow" and lists existing flows with their current stage
 - `/sdf <flow-name>` -- resumes an existing flow from where it left off
-- `/sdf:start <flow-name>` -- kicks off Stage 10 (autonomous implementation) for the named flow, with a fresh context reading only what it needs from that flow's `.sdf/` files. If another flow is mid-implementation, warns and asks to confirm. If any stages are stale, warns before proceeding
+- `/sdf:implement <flow-name>` -- kicks off Stage 10 (autonomous implementation) for the named flow, with a fresh context reading only what it needs from that flow's `.sdf/` files. If another flow is mid-implementation, warns and asks to confirm. If any stages are stale, warns before proceeding
 - `/sdf:<subcommand> <flow-name>` -- jump to a specific stage for the named flow (e.g. `/sdf:questions admin-interface`, `/sdf:plan product-listing`, `/sdf:tests admin-interface`). Triggers stage invalidation for all later stages
 - `/sdf:status` -- show all flows and their current state
 - `/sdf:status <flow-name>` -- show detailed status for a specific flow (includes stale stage warnings)
@@ -240,7 +240,7 @@ This is the gate that ensures the "definition of done" is correct before autonom
 After Stage 9 completes, the orchestrator asks:
 
 > Ready to start implementation, or do you want to make changes first?
-> (A) Start implementation now (`/sdf:start <flow-name>`)
+> (A) Start implementation now (`/sdf:implement <flow-name>`)
 > (B) Make changes first -- use subcommands to revise, then start manually
 
 ## Stage 10: Autonomous Implementation
@@ -256,7 +256,7 @@ Phase status is tracked in `.sdf/flows/<flow-name>/phases/phase_N_status.md` and
 
 ### Concurrent implementation guard
 
-When `/sdf:start <flow-name>` is invoked, SDF checks if any other flow is currently mid-implementation (has a Stage 10 in progress). If so, SDF warns:
+When `/sdf:implement <flow-name>` is invoked, SDF checks if any other flow is currently mid-implementation (has a Stage 10 in progress). If so, SDF warns:
 
 > Flow "admin-interface" is currently mid-implementation (Phase 2/4).
 > Running two implementations concurrently risks file conflicts if both flows touch the same code.

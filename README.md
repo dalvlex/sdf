@@ -4,6 +4,36 @@ A structured, multi-stage development workflow for [Claude Code](https://claude.
 
 SDF walks you through **10 stages**: stating your ask, refining it with targeted Q&A, generating a phased plan, defining a testing strategy, designing tests per phase, reviewing and approving those tests, and then autonomous implementation with built-in escalation when things go wrong.
 
+## TL;DR
+
+1. Clone this repo and install:
+   ```bash
+   git clone <this-repo> ~/sdf
+   ~/sdf/install.sh
+   ```
+
+2. Go to your project and launch the sandbox:
+   ```bash
+   cd ~/your-project
+   ~/sdf/docker/sdf-docker.sh
+   ```
+
+3. Inside Claude Code, start a guided flow:
+   ```
+   /sdf
+   ```
+
+4. SDF walks you through planning, testing strategy, and test design, then kicks off autonomous implementation with `/sdf:implement`.
+
+5. Claude implements phase by phase, runs tests, and asks for help if stuck.
+
+## Dependencies
+
+- **macOS** -- built and tested exclusively on Mac
+- **[Claude Code](https://claude.com/claude-code)** -- requires a Pro or Max subscription
+- **[Docker](https://www.docker.com/products/docker-desktop/)** or **[OrbStack](https://orbstack.dev/)** -- for sandboxed mode
+- **Git**
+
 ## Install
 
 ```bash
@@ -30,7 +60,7 @@ In any project directory, run:
 /sdf
 ```
 
-SDF will walk you through all 10 stages interactively. At the end, it prompts you to start implementation with `/sdf:start`.
+SDF will walk you through all 10 stages interactively. At the end, it prompts you to start implementation with `/sdf:implement`.
 
 ## Sandboxed Mode (Docker)
 
@@ -43,7 +73,7 @@ cd ~/your-project
 ~/path/to/sdf/docker/sdf-docker.sh
 ```
 
-This builds a Docker image (first time only, cached after) and drops you straight into Claude Code with `--dangerously-skip-permissions`. Run `/sdf`, `/sdf:start`, etc. -- no permission prompts.
+This builds a Docker image (first time only, cached after) and drops you straight into Claude Code with `--dangerously-skip-permissions`. Run `/sdf`, `/sdf:implement`, etc. -- no permission prompts.
 
 To get a bash shell instead (e.g. for debugging):
 
@@ -116,7 +146,7 @@ You review tests per phase. For each phase, you can: approve, add tests, remove 
 
 ### Stage 10: Autonomous Implementation
 
-Triggered via `/sdf:start`. Runs in a **fresh context** to avoid context rot. Each phase gets its own fresh subagent context. Claude implements phase by phase, runs tests after each. If a bug can't be fixed in **3 attempts**, Claude pauses and returns control to you with a full diagnosis.
+Triggered via `/sdf:implement`. Runs in a **fresh context** to avoid context rot. Each phase gets its own fresh subagent context. Claude implements phase by phase, runs tests after each. If a bug can't be fixed in **3 attempts**, Claude pauses and returns control to you with a full diagnosis.
 
 ## Commands
 
@@ -124,7 +154,7 @@ Triggered via `/sdf:start`. Runs in a **fresh context** to avoid context rot. Ea
 |---------|-------------|
 | `/sdf` | Start a new flow or resume an existing one |
 | `/sdf <flow-name>` | Resume a specific flow from where it left off |
-| `/sdf:start <flow-name>` | Start autonomous implementation (Stage 10) |
+| `/sdf:implement <flow-name>` | Start autonomous implementation (Stage 10) |
 | `/sdf:verify <flow-name>` | Run all tests, write missing ones, fix failures |
 | `/sdf:simplify <flow-name>` | Simplify code from the flow -- DRY, reduce complexity |
 | `/sdf:status` | Show all flows and their current stage |
@@ -158,7 +188,7 @@ The core of SDF. When you run `/sdf`, this prompt is loaded. It handles:
 
 This is the largest skill file (~300 lines). It is the single source of behavioral truth for the interactive flow.
 
-### `commands/sdf/start.md` -- Stage 10 Launcher
+### `commands/sdf/implement.md` -- Stage 10 Launcher
 
 Runs autonomous implementation in a **fresh context** (no conversation history from planning). Handles:
 
@@ -304,7 +334,7 @@ Whether to add `.sdf/` to `.gitignore` is up to you.
 
 **Interactive stages (1-9)** run in one conversation. The conversation provides UX continuity; `.sdf/` files provide the data. Claude reads from files at each stage boundary, not from conversation memory.
 
-**Autonomous implementation (Stage 10)** runs in a fresh context via `/sdf:start`. Each phase gets its own fresh subagent context to avoid context rot. The subagent reads only its phase's plan slice and test spec from `.sdf/` files.
+**Autonomous implementation (Stage 10)** runs in a fresh context via `/sdf:implement`. Each phase gets its own fresh subagent context to avoid context rot. The subagent reads only its phase's plan slice and test spec from `.sdf/` files.
 
 ## Spec
 

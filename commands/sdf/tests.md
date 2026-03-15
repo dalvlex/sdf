@@ -52,5 +52,5 @@ After all phases are approved:
    - Options: "Start now" / "Start in a new conversation (recommended for large plans)" / "Make changes first"
 
 If **start now**: proceed directly to Stage 10 implementation in this conversation.
-If **new conversation**: tell the user to run `/sdf:start <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
+If **new conversation**: tell the user to run `/sdf:implement <flow-name>` in a new conversation for fresh context. The flow is saved and ready.
 If **make changes first**: the flow is saved and ready.

@@ -14,7 +14,7 @@ A structured, multi-stage development workflow that enforces disciplined decisio
 |---------|-------------|
 | `/sdf` | Start a new flow or resume an existing one |
 | `/sdf <flow-name>` | Resume a specific flow from where it left off |
-| `/sdf:start <flow-name>` | Start autonomous implementation (Stage 10) |
+| `/sdf:implement <flow-name>` | Start autonomous implementation (Stage 10) |
 | `/sdf:verify <flow-name>` | Run all tests, write missing ones, fix failures |
 | `/sdf:simplify <flow-name>` | Simplify code from the flow -- DRY, reduce complexity |
 | `/sdf:status` | Show all flows and their current stage |
@@ -39,7 +39,7 @@ A structured, multi-stage development workflow that enforces disciplined decisio
 7. **Testing Strategy** -- Q&A on testing approach
 8. **Test-First Design** -- tests written per phase
 9. **Test Review** -- approve test suites per phase
-10. **Autonomous Implementation** -- Claude implements and tests (via `/sdf:start`)
+10. **Autonomous Implementation** -- Claude implements and tests (via `/sdf:implement`)
 
 ### Key concepts
 
