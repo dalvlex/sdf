@@ -1,23 +1,23 @@
-# SDF Delete -- Permanently Remove a Flow
+# SDF Delete -- Permanently Remove a Flow or Quest
 
 ## Arguments
-Flow name: $ARGUMENTS
+Flow or quest name: $ARGUMENTS
 
 ## Instructions
 
-1. If no flow name provided, check `.sdf/flows/` for active flows. If one exists, confirm with the user. If multiple, ask which one.
+1. If no name provided, check `.sdf/flows/` for active flows and quests (all subdirectories excluding `_archived`). If one exists, confirm with the user. If multiple, ask which one.
 
-2. Verify the flow exists at `.sdf/flows/<flow-name>/` (also check `.sdf/flows/_archived/<flow-name>/` for archived flows).
-   - If it does not exist, tell the user: "Flow '<flow-name>' not found." List active and archived flows if any exist.
+2. Verify the entry exists at `.sdf/flows/<name>/` (also check `.sdf/flows/_archived/<name>/` for archived entries).
+   - If it does not exist, tell the user: "Flow/quest '<name>' not found." List active and archived flows/quests if any exist.
 
-3. Read the flow's STATE.md and show current status.
+3. Read the entry's STATE.md and show current status. Determine if this is a quest (name contains `--` or `type: quest` in STATE.md) or a flow.
 
-4. Warn the user clearly:
-   > PERMANENTLY DELETE flow "<flow-name>" and all its files?
+4. Warn the user clearly, using the correct term (flow or quest):
+   > PERMANENTLY DELETE <flow/quest> "<name>" and all its files?
    > This cannot be undone. All plans, decisions, test specs, and phase status will be lost.
    > (A) Yes, permanently delete
    > (B) Cancel
 
 5. If confirmed:
-   - Remove the entire flow directory (`.sdf/flows/<flow-name>/` or `.sdf/flows/_archived/<flow-name>/`).
-   - Tell the user: "Flow '<flow-name>' permanently deleted."
+   - Remove the entire directory (`.sdf/flows/<name>/` or `.sdf/flows/_archived/<name>/`).
+   - Tell the user: "<Flow/Quest> '<name>' permanently deleted."

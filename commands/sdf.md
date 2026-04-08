@@ -11,7 +11,7 @@ The user may have provided a flow name: $ARGUMENTS
 - If no arguments, continue to Step 2.
 
 **Step 2: Check for existing flows.**
-Check if `.sdf/flows/` exists and contains any subdirectories (excluding `_archived`).
+Check if `.sdf/flows/` exists and contains any subdirectories (excluding `_archived`). **Filter out quest directories** (directories whose name contains `--`) -- those are managed by `/sdf:quest`, not `/sdf`.
 
 - If **no flows exist**: proceed directly to **Brownfield Detection**, then **Stage 1**.
 - If **one flow exists**: ask the user:

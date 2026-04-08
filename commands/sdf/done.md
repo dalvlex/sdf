@@ -1,24 +1,24 @@
-# SDF Done -- Archive a Completed Flow
+# SDF Done -- Archive a Completed Flow or Quest
 
 ## Arguments
-Flow name: $ARGUMENTS
+Flow or quest name: $ARGUMENTS
 
 ## Instructions
 
-1. If no flow name provided, check `.sdf/flows/` for active flows. If one exists, confirm with the user. If multiple, ask which one.
+1. If no name provided, check `.sdf/flows/` for active flows and quests (all subdirectories excluding `_archived`). If one exists, confirm with the user. If multiple, ask which one.
 
-2. Verify the flow exists at `.sdf/flows/<flow-name>/`.
-   - If it does not exist, tell the user: "Flow '<flow-name>' not found." List active flows if any exist.
+2. Verify the entry exists at `.sdf/flows/<name>/`.
+   - If it does not exist, tell the user: "Flow/quest '<name>' not found." List active flows and quests if any exist.
 
-3. Read `.sdf/flows/<flow-name>/STATE.md` and show current status to the user.
+3. Read `.sdf/flows/<name>/STATE.md` and show current status. Determine if this is a quest (name contains `--` or `type: quest` in STATE.md) or a flow.
 
-4. Confirm with the user:
-   > Archive flow "<flow-name>"? This moves it to `.sdf/flows/_archived/<flow-name>/`.
-   > The files are kept for reference but the flow is removed from active listings.
+4. Confirm with the user, using the correct term (flow or quest):
+   > Archive <flow/quest> "<name>"? This moves it to `.sdf/flows/_archived/<name>/`.
+   > The files are kept for reference but the <flow/quest> is removed from active listings.
    > (A) Yes, archive it
    > (B) Cancel
 
 5. If confirmed:
    - Create `.sdf/flows/_archived/` if it does not exist.
-   - Move `.sdf/flows/<flow-name>/` to `.sdf/flows/_archived/<flow-name>/`.
-   - Tell the user: "Flow '<flow-name>' archived."
+   - Move `.sdf/flows/<name>/` to `.sdf/flows/_archived/<name>/`.
+   - Tell the user: "<Flow/Quest> '<name>' archived."

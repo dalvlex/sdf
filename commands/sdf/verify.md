@@ -7,16 +7,19 @@ Flow name: $ARGUMENTS
 
 ## Instructions
 
-1. **Resolve flow name.** If no name provided, check `.sdf/flows/` for active flows. If one, use it. If multiple, ask which one.
+1. **Resolve flow name.** If no name provided, check `.sdf/flows/` for active flows and quests (all subdirectories excluding `_archived`). If one, use it. If multiple, ask which one.
 
-2. **Load flow state.** Read `.sdf/flows/<flow-name>/STATE.md`. Verify the flow has reached at least Stage 10 (implementation started or completed).
+2. **Load flow state.** Read `.sdf/flows/<flow-name>/STATE.md`. Check the `type` field:
+   - If `type: quest` (or the name contains `--`): verify `current_stage` is at least 4 (implementation started or completed).
+   - Otherwise (full flow): verify `current_stage` is at least 10 (implementation started or completed).
+   If not ready, tell the user which command to run first (`/sdf <flow-name>` for flows, `/sdf:quest <quest-name>` for quests). Stop.
 
 3. **Load context.** Read:
-   - `.sdf/flows/<flow-name>/PLAN_<flow-name>.md`
-   - `.sdf/flows/<flow-name>/TESTING_STRATEGY.md`
+   - `.sdf/flows/<flow-name>/PLAN_<flow-name>.md` -- this applies to both flows and quests (e.g., `PLAN_rehab-tracker--add-week-block.md` for a quest named `rehab-tracker--add-week-block`)
+   - `.sdf/flows/<flow-name>/TESTING_STRATEGY.md` -- if not found and this is a quest, read from the parent flow's directory (the `parent` field in STATE.md points to `.sdf/flows/<parent>/TESTING_STRATEGY.md`). If parent is `standalone` or no strategy exists anywhere, infer testing approach from `.sdf/CODEBASE_SCAN.md`.
    - `.sdf/flows/<flow-name>/tests/phase_N_tests.md` for each phase
    - `.sdf/CODEBASE_SCAN.md` (if it exists)
-   - `.sdf/LEARNINGS.md` (if it exists) -- project-wide learnings from previous flows
+   - `.sdf/LEARNINGS.md` (if it exists) -- project-wide learnings from previous flows and quests
    - `CLAUDE.md` and `README.md` from the project root (if they exist) -- follow any conventions they specify
 
 4. **Reset all phase statuses.** Before running any tests, reset every phase's status to `pending`. For each phase, update `.sdf/flows/<flow-name>/phases/phase_N_status.md`:

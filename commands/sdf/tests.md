@@ -7,9 +7,11 @@ Flow name: $ARGUMENTS
 
 ## Instructions
 
-1. **Resolve flow name.** If no name provided, check `.sdf/flows/` for active flows. If one, use it. If multiple, ask which one.
+1. **Resolve flow name.** If no name provided, check `.sdf/flows/` for active flows (exclude quest directories whose name contains `--`). If one, use it. If multiple, ask which one.
 
-2. **Load flow state.** Read `.sdf/flows/<flow-name>/STATE.md`. Verify the flow has a testing strategy (Stage 7 completed).
+2. **Load flow state.** Read `.sdf/flows/<flow-name>/STATE.md`.
+   - If `type: quest` (or the name contains `--`): tell the user "This is a quest, not a full flow. Quest tests are auto-generated during implementation. Use `/sdf:quest <name>` to manage quests." Stop.
+   - Verify the flow has a testing strategy (Stage 7 completed).
 
 3. **Trigger stage invalidation.** Mark stage 9 as stale in STATE.md (since we are re-running Stage 8). Inform the user:
    > Re-running Stages 8-9 (test design and review).

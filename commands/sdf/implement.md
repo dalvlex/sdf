@@ -8,11 +8,12 @@ You are running the SDF autonomous implementation phase. This runs with a **fres
 Flow name from arguments: $ARGUMENTS
 
 - If a flow name was provided, use it.
-- If no flow name: check `.sdf/flows/` for active flows. If one exists, use it. If multiple, list them and ask the user which one.
+- If no flow name: check `.sdf/flows/` for active flows (exclude quest directories whose name contains `--`). If one exists, use it. If multiple, list them and ask the user which one.
 
 **Step 2: Validate readiness.**
 Read `.sdf/flows/<flow-name>/STATE.md`.
 
+- If `type: quest` (or the name contains `--`): tell the user "This is a quest, not a flow. Quest implementation runs within `/sdf:quest <name>`, not `/sdf:implement`." Stop.
 - If current_stage is less than 9: tell the user "This flow has not completed all planning stages. Run `/sdf <flow-name>` to continue planning first." Stop.
 - If any stages are marked stale: warn the user:
   > WARNING: Some stages are stale -- outputs may not reflect the latest decisions.
@@ -22,11 +23,11 @@ Read `.sdf/flows/<flow-name>/STATE.md`.
   Wait for response. If (B), stop.
 
 **Step 3: Check concurrent implementation guard.**
-Check all flow directories in `.sdf/flows/` (excluding `_archived`). If any other flow has `current_stage: 10` in its STATE.md:
-> Flow "<other-flow>" is currently mid-implementation (Phase X/Y).
-> Running two implementations concurrently risks file conflicts if both flows touch the same code.
+Check all flow directories in `.sdf/flows/` (excluding `_archived`). If any other flow or quest is mid-implementation -- check for `current_stage: 10` (full flows) or `current_stage: 4` with `type: quest` (quests) in their STATE.md:
+> Flow/quest "<other-name>" is currently mid-implementation.
+> Running two implementations concurrently risks file conflicts if both touch the same code.
 > (A) Proceed anyway
-> (B) Cancel -- finish the other flow first
+> (B) Cancel -- finish the other one first
 
 Wait for response. If (B), stop.
 

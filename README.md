@@ -27,6 +27,11 @@ SDF walks you through **10 stages**: stating your ask, refining it with targeted
 
 5. Claude implements phase by phase, runs tests, and asks for help if stuck.
 
+6. For follow-up changes, use a quest:
+   ```
+   /sdf:quest
+   ```
+
 ## Dependencies
 
 - **macOS** -- built and tested exclusively on Mac
@@ -98,6 +103,55 @@ Full access -- internet, localhost services (via `host.docker.internal`), LAN da
 
 Claude can `sudo apt-get install` mid-session. To persist packages across container rebuilds, add package names to `.sdf/packages.txt` (one per line).
 
+## Quests -- Lightweight Side Flows
+
+After completing a full SDF flow, you will often need to make follow-up changes: fix something, add a feature, update tests. These are **quests** -- focused, well-scoped changes that go through a compressed 5-stage flow instead of the full 10.
+
+### When to use a quest vs a full flow
+
+- **Full flow** (`/sdf`): The ask is large or ambiguous. You need thorough Q&A, a testing strategy discussion, and test review before implementation.
+- **Quest** (`/sdf:quest`): The ask is clear and scoped. You know what you want changed. You just need a plan, tests, and disciplined implementation.
+
+### Quest stages
+
+| Stage | What happens | Full SDF equivalent |
+|-------|-------------|---------------------|
+| 1. Ask | State the change | Stage 1 |
+| 2. Confirm | Echo back + multi-round Q&A + refined ask | Stages 2+3+4 collapsed |
+| 3. Plan | Auto-generate plan, approve | Stages 5+6 collapsed |
+| 4. Implement | Auto-generate tests, implement phase by phase | Stages 7+8+9+10 collapsed |
+| 5. Verify + Simplify | Same pipeline as full SDF | Same |
+
+### Quest naming
+
+Quest directories are always prefixed with their parent flow name, separated by `--`:
+
+```
+.sdf/flows/
+  rehab-tracker/                          # full flow
+  rehab-tracker--add-week-block/          # quest on rehab-tracker
+  rehab-tracker--fix-sessions/            # quest on rehab-tracker
+  standalone--import-cleanup/             # quest with no parent flow
+```
+
+This makes it immediately clear which quests belong to which flow. Standalone quests (no parent flow) use the `standalone` prefix.
+
+### Context inheritance
+
+Quests inherit from their parent flow:
+- **Testing strategy** -- no need to re-discuss frameworks and approach
+- **Codebase scan** -- shared across all flows and quests
+- **Learnings** -- project-wide, accumulated from all flows and quests
+
+### Running a quest
+
+```
+/sdf:quest                    # start a new quest or resume
+/sdf:quest <quest-name>       # resume a specific quest
+```
+
+All post-implementation commands work on quests: `/sdf:verify`, `/sdf:simplify`, `/sdf:done`, `/sdf:delete`, `/sdf:status`.
+
 ## The 10 Stages
 
 ### Stages 1-2: Ask and Echo Back
@@ -144,18 +198,20 @@ Triggered via `/sdf:implement`. Runs in a **fresh context** to avoid context rot
 |---------|-------------|
 | `/sdf` | Start a new flow or resume an existing one |
 | `/sdf <flow-name>` | Resume a specific flow from where it left off |
+| `/sdf:quest` | Start a new quest or resume an existing one |
+| `/sdf:quest <quest-name>` | Resume a specific quest |
 | `/sdf:implement <flow-name>` | Start autonomous implementation (Stage 10) |
 | `/sdf:verify <flow-name>` | Run all tests, write missing ones, fix failures |
 | `/sdf:simplify <flow-name>` | Simplify code from the flow -- DRY, reduce complexity |
-| `/sdf:status` | Show all flows and their current stage |
-| `/sdf:status <flow-name>` | Show detailed phase-level status for a flow |
+| `/sdf:status` | Show all flows and quests with their current stage |
+| `/sdf:status <name>` | Show detailed status for a specific flow or quest |
 | `/sdf:questions <flow-name>` | Jump to Stage 3 -- re-run ask questions |
 | `/sdf:plan <flow-name>` | Jump to Stage 5 -- regenerate the plan |
 | `/sdf:plan-questions <flow-name>` | Jump to Stage 6 -- re-run plan questions |
 | `/sdf:testing <flow-name>` | Jump to Stage 7 -- re-run testing strategy |
 | `/sdf:tests <flow-name>` | Jump to Stages 8-9 -- redesign and review tests |
-| `/sdf:done <flow-name>` | Archive a completed flow |
-| `/sdf:delete <flow-name>` | Permanently delete a flow and all its files |
+| `/sdf:done <name>` | Archive a completed flow or quest |
+| `/sdf:delete <name>` | Permanently delete a flow or quest |
 | `/sdf:help` | Show all commands in Claude Code |
 
 If only one flow exists and no name is provided, SDF assumes that flow. If multiple exist, it asks which one.
@@ -177,6 +233,17 @@ The core of SDF. When you run `/sdf`, this prompt is loaded. It handles:
 - **File I/O**: reads from and writes to `.sdf/flows/<flow-name>/` at every stage boundary
 
 This is the largest skill file (~300 lines). It is the single source of behavioral truth for the interactive flow.
+
+### `commands/sdf/quest.md` -- Quest Orchestrator
+
+The lightweight flow for focused changes. When you run `/sdf:quest`, this prompt is loaded. It handles:
+
+- **Parent flow detection**: identifies which flow the quest belongs to, or marks as standalone
+- **Context inheritance**: reads parent flow's testing strategy, codebase scan, and learnings
+- **Compressed stages**: 5 stages instead of 10 -- Ask, Confirm (echo+questions combined), Plan, Implement (tests auto-generated), Verify+Simplify
+- **Quest naming**: enforces `<parent>--<quest-name>` convention
+- **Same implementation engine**: subagent-per-phase, 3-attempt escalation, bug-fixing discipline
+- **Same verify+simplify pipeline**: runs automatically after implementation
 
 ### `commands/sdf/implement.md` -- Stage 10 Launcher
 
@@ -301,8 +368,9 @@ When starting Stage 10 for a flow, SDF checks if another flow is already mid-imp
 ```
 .sdf/
   CODEBASE_SCAN.md                          -- codebase analysis (shared across flows)
+  LEARNINGS.md                              -- project-wide learnings (shared across flows)
   flows/
-    <flow-name>/
+    <flow-name>/                            -- full flow (10 stages)
       STATE.md                              -- stage, checkpoints, approvals, validity
       REFINED_ASK.md                        -- approved ask (Stage 4)
       DECISIONS_ASK.md                      -- Q&A decisions (Stage 3)
@@ -314,8 +382,17 @@ When starting Stage 10 for a flow, SDF checks if another flow is already mid-imp
       phases/
         phase_N_status.md                   -- implementation status (Stage 10)
         phase_N_blocked.md                  -- escalation diagnosis (Stage 10)
+    <flow-name>--<quest-name>/              -- quest (5 stages, lightweight)
+      STATE.md                              -- stage, type: quest, parent
+      REFINED_ASK.md                        -- confirmed ask (Stage 2)
+      PLAN_<full-quest-name>.md              -- implementation plan (Stage 3)
+      tests/
+        phase_N_tests.md                    -- auto-generated test specs (Stage 4)
+      phases/
+        phase_N_status.md                   -- implementation status (Stage 4)
+        phase_N_blocked.md                  -- escalation diagnosis (Stage 4)
     _archived/
-      <flow-name>/                          -- archived flows (via /sdf:done)
+      <name>/                               -- archived flows and quests (via /sdf:done)
 ```
 
 Whether to add `.sdf/` to `.gitignore` is up to you.
